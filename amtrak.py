@@ -1,4 +1,5 @@
 # Importing libraries
+from turtle import title
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
@@ -6,8 +7,6 @@ from undetected_chromedriver import Chrome
 import csv
 import time
 import argparse
-months_31 = [1, 3, 5, 7, 8, 10, 12]
-months_30 = [4, 6, 9, 11]
 
 def parse_var(s):
     items = s.split('=')
@@ -32,9 +31,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', metavar='KEY=VALUE', nargs='+')
     args = parse_vars(parser.parse_args().a)
-    date = args.get('start_date').split('-')
-    year, month, day = date
-    date = '/'.join([month, day, year])
 
     # Initializing selenium
     driver = Chrome()
@@ -50,150 +46,75 @@ if __name__ == '__main__':
     # Get search queries
     from_ = args.get('from')
     to_ = args.get('to')
-
-    start_date = args.get('start_date').split('-')
-    start_year, start_month, start_day = start_date
-    start_date = '/'.join([str(int(start_month)), str(int(start_day)), str(int(start_year))])  # start date
-
-    end_date = args.get('end_date').split('-') #end date
-    end_year, end_month, end_day = end_date
-    end_date = '/'.join([str(int(end_month)), str(int(end_day)), str(int(end_year))])
-
-    p = int(args.get('people'))
+    year, month, day = args.get('start_date').split('-')
+    start_date = '/'.join([month, day, year])
+    year, month, day = args.get('end_date').split('-')
+    end_date = '/'.join([month, day, year])
 
     # Fill inputs
     driver.find_element(By.CSS_SELECTOR, '#mat-input-0').send_keys(from_)
     driver.find_element(By.CSS_SELECTOR, '#mat-input-1').send_keys(to_)
     driver.find_element(By.CSS_SELECTOR, '#mat-input-2').send_keys(start_date)
-    driver.find_element(By.CSS_SELECTOR, '.t-title').click()
-    while p > 1:
-        driver.find_element(By.CSS_SELECTOR, '.increment').click()
-        p -= 1
+    driver.find_element(By.XPATH, '//*[contains(text(), "Return Date")]').click()
+    driver.find_element(By.CSS_SELECTOR, '#mat-input-4').send_keys(end_date)
     driver.find_element(By.CSS_SELECTOR, '.pl-lg-3').click()
-    time.sleep(1)
+    driver.find_element(By.CSS_SELECTOR, '.pl-lg-3').click()
+    time.sleep(3)
 
-
-    elements = driver.find_elements(By.CSS_SELECTOR, '.search-results-leg')
+    # Get results
+    trains = driver.find_elements(By.CSS_SELECTOR, '.col-lg-12')
     results = []
-    opt_results = []
-
-    def enter_a_date(the_date):
-        driver.find_element(By.CSS_SELECTOR, '.refine-search-btn.ng-star-inserted > button').click()
-        time.sleep(1)
-        driver.find_element(By.CSS_SELECTOR, '#mat-input-2').send_keys(Keys.BACKSPACE * 10)
-        driver.find_element(By.CSS_SELECTOR, '#mat-input-2').send_keys(the_date)
-        driver.find_element(By.CSS_SELECTOR, '.pl-lg-3').click()
-        time.sleep(2)
-
-    def get_results_for_a_date(): #Gets results for all of the following days
-        elements = driver.find_elements(By.CSS_SELECTOR, '.search-results-leg')
-        for element in elements:
+    for train in trains:
+        title = train.find_elements(By.CSS_SELECTOR, '.pt-1.ng-star-inserted span')[-1].text
+        depart = train.find_element(By.CSS_SELECTOR, '.departure-inner .font-light').text
+        depart += train.find_element(By.CSS_SELECTOR, '.departure-inner .time-period').text
+        travel_elements = train.find_elements(By.CSS_SELECTOR, '.travel-time .text-center')
+        travel_time = '\n'.join([e.text for e in travel_elements])
+        arrive = train.find_element(By.CSS_SELECTOR, '.arrival-inner .font-light').text
+        arrive += train.find_element(By.CSS_SELECTOR, '.arrival-inner .time-period').text
+        arrive += '\n' + train.find_element(By.CSS_SELECTOR, '.travel-next-day span').text
+        try:
+            coach_from = train.find_element(By.CSS_SELECTOR, '.text-center:nth-child(1) .amount').text
+        except:
+            coach_from = None
+        try:
+            business_form = train.find_element(By.CSS_SELECTOR, '.text-center:nth-child(2) .amount').text
+        except:
+            business_form = None
+        try:
+            rooms_from = train.find_element(By.CSS_SELECTOR, '.text-center:nth-child(3) .amount').text
+        except:
+            rooms_from = None
+        Trip_Details = train.find_element(By.CSS_SELECTOR, '.dropdown-toggle span')
+        while True:
             try:
-                train = element.find_element(By.CSS_SELECTOR, '.pt-1.ng-star-inserted span').text + ' ' + \
-                        element.find_elements(By.CSS_SELECTOR, '.handpointer')[1].text
+                Trip_Details.click()
+                a = train.find_element(By.XPATH, '//*[contains(text(), "Services")]')
+                a.click()
+                break
             except:
-                train = element.find_element(By.CSS_SELECTOR, '.pt-1.ng-star-inserted span').text
-            depart = element.find_element(By.CSS_SELECTOR, '.departure-inner .font-light').text
-            depart += element.find_element(By.CSS_SELECTOR, '.departure-inner .time-period').text
-            travel_elements = element.find_elements(By.CSS_SELECTOR, '.travel-time .text-center')
-            travel_time = ' '.join([e.text for e in travel_elements])
-            arrive = element.find_element(By.CSS_SELECTOR, '.arrival-inner .font-light').text
-            arrive += element.find_element(By.CSS_SELECTOR, '.arrival-inner .time-period').text
-            arrive += element.find_element(By.CSS_SELECTOR, '.travel-next-day span').text
-            try:
-                coach_from = element.find_element(By.CSS_SELECTOR, '.text-center:nth-child(1) .amount').text
-            except:
-                coach_from = 'None'
-            try:
-                business_from = element.find_element(By.CSS_SELECTOR, '.text-center:nth-child(2) .amount').text
-            except:
-                business_from = 'None'
-            try:
-                rooms_from = element.find_element(By.CSS_SELECTOR, '.text-center:nth-child(3) .amount').text
-            except:
-                rooms_from = 'None'
-            # help needed below
-            if train == "Multiple Trains":
-                multiple_trains = []
-                # Click on the 'Trip Details' button for each item that is listed as 'Multiple Trains'
-                element.find_element(By.CSS_SELECTOR, '.arrival-inner .details-dropdown.mt-2 .ng-tns-c4-15').click()
-                # ^^^^ gives random errors
-                element.find_element(By.CSS_SELECTOR, 'ul > li:nth-child(2) > a').click() # clicks the "Services" button
-                time.sleep(1)
-
-                train = ', '.join([train for train in multiple_trains])
-                # the list multiple_trains should look like ['8 Empire Builder', '14 Coast Starlight']
-                # 'train' should be replaced with a list of the names of multiple trains, for example,
-                # '8 Empire Builder, 14 Coast Starlight' instead of 'Multiple Trains'
-                # unless there is another better way to do this
-
-            data = {'Date': new_date, 'Train': train, 'Depart time': depart, 'Travel time': travel_time,
-                    'Arrive time': arrive, 'Coach from': coach_from, 'Business from': business_from,
-                    'Rooms from': rooms_from}
-            results.append(data)
-            if train != "Mixed Service":
-                if rooms_from != 'None':
-                    opt_data = {'Date': new_date, ' Train': " " + train, ' Rooms/First from': " " + rooms_from}
-                    opt_results.append(opt_data)
-                if rooms_from == 'None':
-                    opt_data = {'Date': new_date, ' Train': " " + train, ' Rooms/First from': " " + business_from}
-                    opt_results.append(opt_data)
-
-    new_date = start_date
-    get_results_for_a_date()
-    new_date = ""
-    new_day = int(start_day)
-    new_month = int(start_month)
-    new_year = int(start_year)
-    while new_date != end_date and start_date != end_date:
-        new_day = new_day + 1
-        if new_day > 28 and new_year % 4 != 0 and new_month == 2:  # checks feb
-            new_day = 1
-            new_month = 3
-        if new_day > 29 and new_year % 4 == 0 and new_month == 2:  # checks leap feb
-            new_day = 1
-            new_month = 3
-        if new_day > 30 and new_month in months_30:  # checks months with 30 days
-            new_day = 1
-            new_month += 1
-        if new_day > 31 and new_month in months_31:  # checks months with 31 days
-            new_day = 1
-            new_month += 1
-        if new_month > 12:  # checks if a new year is occurring
-            new_day = 1
-            new_month = 1
-            new_year += 1
-
-        new_date = '/'.join([str(int(new_month)), str(int(new_day)), str(int(new_year))])
-        enter_a_date(new_date)
-        get_results_for_a_date()
-
-    # Find minimum value over all dates
-    min_list = []
-    min_dates = []
-    for i in range(0, len(opt_results)):
-        if opt_results[i][' Rooms/First from'] != ' None':
-            min_list.append(int(opt_results[i][' Rooms/First from'].replace("$", "")))
-    min_value = min(min_list)
-    for data_set in opt_results:
-        if data_set[' Rooms/First from'] != ' None':
-            if int(data_set[' Rooms/First from'].replace("$", "")) == min_value:
-                min_dates.append(data_set)
-
+                actions.move_to_element(train.find_element(By.CSS_SELECTOR, '.departure-inner .font-light'))
+                actions.click()
+                actions.send_keys(Keys.ARROW_DOWN)
+                actions.perform()
+                continue
+        services = train.find_elements(By.CSS_SELECTOR, '.dropdown-container .travel-type-service')
+        if len(services) == 0:
+            train_names = title
+        else:
+            train_names = []
+            for segment in services:
+                train_names.append(segment.text.replace('\n', ' '))
+            train_names = ', '.join(train_names)
+        actions.send_keys(Keys.ESCAPE).perform() 
+        data = {'Title': title, 'Depart time': depart, 'Travel time': travel_time, 'Arrive time': arrive, 'Coach from': coach_from, 'Business form': business_form, 'Rooms from': rooms_from, 'Train names': train_names}
+        print(data)
+        results.append(data)
+    
     # Save results in a csv flie
+    print(results)
     keys = results[0].keys()
-    keys2 = opt_results[0]
-    prompt = ['Min values: ']
-    with open('results.csv', 'w') as output_file:
+    with open('results.csv', 'w', newline='') as output_file:
         dict_writer = csv.DictWriter(output_file, keys)
         dict_writer.writeheader()
         dict_writer.writerows(results)
-
-    with open('optimization.csv', 'w') as best_file:
-        dict_writer = csv.DictWriter(best_file, keys2)
-        dict_writer.writeheader()
-        dict_writer.writerows(opt_results)
-        writer = csv.writer(best_file)
-        writer.writerow(prompt)
-        dict_writer.writerows(min_dates)
-

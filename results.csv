@@ -1,8 +1,25 @@
-Date,Train,Depart time,Travel time,Arrive time,Coach from,Business from,Rooms from
-6/1/2022,3 Southwest Chief,2:50p,43h 10m Direct,"8:00aFri, Jun 3",$292,None,$1274
-6/1/2022,Mixed Service,2:00p,62h 15m 3 Segment,"2:15aSat, Jun 4",$375,None,$1367
-6/1/2022,Mixed Service,2:00p,62h 15m 4 Segment,"2:15aSat, Jun 4",$360,None,$1348
-6/1/2022,Mixed Service,2:15p,76h 20m 5 Segment,"4:35pSat, Jun 4",$534,$612,$1900
-6/1/2022,Mixed Service,2:15p,76h 20m 5 Segment,"4:35pSat, Jun 4",$534,$612,$1900
-6/1/2022,Mixed Service,2:15p,76h 20m 5 Segment,"4:35pSat, Jun 4",$534,$612,$1900
-6/1/2022,Multiple Trains,2:15p,80h 56m 2 Segment,"9:11pSat, Jun 4",$498,$612,$2056
+Title,Depart time,Travel time,Arrive time,Coach from,Business form,Rooms from,Train names
+California Zephyr,9:10a,"51h 40m
+Direct","2:50p
+Sun, Jun 12",$141,,$1052,California Zephyr
+Mixed Service,7:46a,"53h 4m
+3 Segment","2:50p
+Sun, Jun 12",$197,,$1082,"710 San Joaquins, Connecting Bus Operated by Amtrak Chartered Motorcoach 5710, 4 Southwest Chief"
+Mixed Service,7:46a,"53h 4m
+3 Segment","2:50p
+Sun, Jun 12",$197,,$1082,"710 San Joaquins, Connecting Bus Operated by Amtrak Chartered Motorcoach 5810, 4 Southwest Chief"
+Multiple Trains,9:47p,"64h 8m
+2 Segment","3:55p
+Mon, Jun 13",$226,$269,$1194,"14 Coast Starlight, 28 Empire Builder"
+Mixed Service,11:46a,"73h 35m
+3 Segment","3:21p
+Mon, Jun 13",$197,,$1225,"714 San Joaquins, Connecting Bus Operated by Amtrak Chartered Motorcoach 5814, 422 Texas Eagle"
+Mixed Service,9:46a,"75h 35m
+3 Segment","3:21p
+Mon, Jun 13",$197,,$1225,"712 San Joaquins, Connecting Bus Operated by Amtrak Chartered Motorcoach 5712, 422 Texas Eagle"
+Mixed Service,9:46a,"75h 35m
+3 Segment","3:21p
+Mon, Jun 13",$197,,$1225,"712 San Joaquins, Connecting Bus Operated by Amtrak Chartered Motorcoach 5812, 422 Texas Eagle"
+Multiple Trains,8:39a,"76h 42m
+2 Segment","3:21p
+Mon, Jun 13",$200,$232,$1529,"11 Coast Starlight, 422 Texas Eagle"
